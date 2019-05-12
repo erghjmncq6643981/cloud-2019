@@ -15,6 +15,8 @@ package com.chandler.instance.client.example;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.consul.serviceregistry.ConsulAutoServiceRegistrationAutoConfiguration;
+import org.springframework.cloud.consul.serviceregistry.ConsulServiceRegistryAutoConfiguration;
 import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
 
 /**
@@ -25,7 +27,12 @@ import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
  * @since 1.8
  */
 @EnableEurekaClient
-@SpringBootApplication
+//@EnableDiscoveryClient
+@SpringBootApplication(exclude = {
+//        EurekaClientAutoConfiguration.class
+        ConsulAutoServiceRegistrationAutoConfiguration.class,
+        ConsulServiceRegistryAutoConfiguration.class
+})
 public class Application {
 	public static void main(String[] args) {
 		SpringApplication.run(Application.class, args);
