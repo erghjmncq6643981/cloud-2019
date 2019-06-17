@@ -1,0 +1,49 @@
+
+spring:
+  application:
+    name: gateway-instance-peer
+  cloud:
+    consul:
+      discovery:
+        host: localhost
+        port: 8500
+        register: true
+        service-name: ${spring.application.name}
+        #hostname: localhost
+        tags: version=1.0,author=chandler
+        healthCheckPath: /actuator/health
+        healthCheckInterval: 5s
+        instanceId: ${spring.application.name}:${vcap.application.instance_id:${spring.application.instance_id:${random.value}}}
+    gateway:
+      discovery:
+        locator:
+          # 是否可以通过其他服务的serviceId来转发到具体的服务实例。默认为false
+          enabled: false
+          # 支持小写的serviceId
+          lower-case-service-id: true
+      routes:
+        - id: frist-route-demo
+          uri: lb://service-instance-peer
+          predicates:
+            - Path=/frist/**
+          filters:
+            - StripPrefix=1   # 去除路由前缀，/frist
+
+server:
+  port: 8855
+#eureka 注册中心
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8888/eureka/
+      #defaultZone=http://localhost:8887/eureka/,http://localhost:8888/eureka/,http://localhost:8889/eureka/
+    registerWithEureka: true                  #将自己注册到eureka注册中心，单节点关闭
+    fetch-registry: true                      #从注册中心获取注册信息，单节点关闭
+    registryFetchIntervalSeconds: 10          #从注册中心获取注册信息的时间间隔
+    registry-fetch-interval-seconds: 5        #从注册中心获取注册信息的时间间隔
+    eureka-server-connect-timeout-seconds: 15
+    eureka-server-read-timeout-seconds: 10
+  instance:
+    leaseRenewalIntervalInSeconds: 15         #eureka节点定时续约时间，默认30
+    leaseExpirationDurationInSeconds: 45      #eureka节点剔除时间，默认90
+    instance-id: ${spring.cloud.client.ip-address}:${spring.application.name}:${server.port}
