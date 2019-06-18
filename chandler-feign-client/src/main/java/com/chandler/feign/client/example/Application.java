@@ -26,13 +26,13 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
  * @author 钱丁君-chandler 2019/5/17下午4:14
  * @since 1.8
  */
-//@EnableEurekaClient
-@EnableDiscoveryClient
+@EnableEurekaClient
+//@EnableDiscoveryClient
 @SpringBootApplication(exclude = {
-        EurekaClientAutoConfiguration.class
-//        ConsulAutoServiceRegistrationAutoConfiguration.class,
-//        ConsulDiscoveryClientConfiguration.class,
-//        ConsulServiceRegistryAutoConfiguration.class
+//        EurekaClientAutoConfiguration.class
+        ConsulAutoServiceRegistrationAutoConfiguration.class,
+        ConsulDiscoveryClientConfiguration.class,
+        ConsulServiceRegistryAutoConfiguration.class
 })
 @RibbonClient(value = "service-instance-peer")
 @EnableFeignClients(basePackages = { "com.chandler.feign.client.example.inter" })

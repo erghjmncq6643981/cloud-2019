@@ -12,7 +12,7 @@ import org.springframework.cloud.netflix.eureka.server.EnableEurekaServer;
  * @since 1.8
  */
 @EnableEurekaServer
-@SpringBoot月薪17K，养个人随便Application
+@SpringBootApplication
 public class Application {
 	public static void main(String[] args) {
 		SpringApplication.run(Application.class, args);

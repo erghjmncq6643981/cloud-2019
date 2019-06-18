@@ -12,7 +12,10 @@ package com.chandler.gateway.server.example;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
-import org.springframework.cloud.netflix.eureka.EurekaClientAutoConfiguration;
+import org.springframework.cloud.consul.discovery.ConsulDiscoveryClientConfiguration;
+import org.springframework.cloud.consul.serviceregistry.ConsulAutoServiceRegistrationAutoConfiguration;
+import org.springframework.cloud.consul.serviceregistry.ConsulServiceRegistryAutoConfiguration;
+import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
 
 /**
  * 网关路由gateway-eureka，consul客户端
@@ -21,13 +24,13 @@ import org.springframework.cloud.netflix.eureka.EurekaClientAutoConfiguration;
  * @since 1.8
  */
 
-//@EnableEurekaClient
-@EnableDiscoveryClient
+@EnableEurekaClient
+//@EnableDiscoveryClient
 @SpringBootApplication(exclude = {
-        EurekaClientAutoConfiguration.class
-//        ConsulAutoServiceRegistrationAutoConfiguration.class,
-//		ConsulDiscoveryClientConfiguration.class,
-//        ConsulServiceRegistryAutoConfiguration.class
+//        EurekaClientAutoConfiguration.class
+        ConsulAutoServiceRegistrationAutoConfiguration.class,
+        ConsulDiscoveryClientConfiguration.class,
+        ConsulServiceRegistryAutoConfiguration.class
 })
 public class Application {
     public static void main(String[] args) {

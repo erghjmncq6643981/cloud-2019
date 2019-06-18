@@ -22,15 +22,15 @@ import org.springframework.web.bind.annotation.*;
 //@FeignClient(value = "service-instance-peer")
 @FeignClient(name="${feign.server.name}")
 public interface FeignClientExample {
-    @RequestMapping(value = "/demo/getHost", method = RequestMethod.GET, produces = "application/json")
+    @RequestMapping(value = "/frist/demo/getHost", method = RequestMethod.GET, produces = "application/json")
     public String getHost(@RequestParam("name") String name);
 
-    @RequestMapping(value = "/demo/postPerson", method = RequestMethod.POST, produces = "application/json; charset=UTF-8")
+    @RequestMapping(value = "/frist/demo/postPerson", method = RequestMethod.POST, produces = "application/json; charset=UTF-8")
     public Person postPerson(@RequestParam("name") String name);
 
-    @RequestMapping(value = "/body/postPerson", method = RequestMethod.POST, produces = "application/json; charset=UTF-8")
+    @RequestMapping(value = "/frist/body/postPerson", method = RequestMethod.POST, produces = "application/json; charset=UTF-8")
     public Person postPerson(@RequestBody Person person);
 
-    @RequestMapping(value = "/head/getHost", method = RequestMethod.GET, produces = "application/json")
+    @RequestMapping(value = "/frist/head/getHost", method = RequestMethod.GET, produces = "application/json")
     public String getHost(@RequestParam("name") String name, @RequestHeader("age") int age);
 }
