@@ -24,8 +24,7 @@ import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
  * @since 1.8
  */
 
-@EnableEurekaClient
-//@EnableDiscoveryClient
+@EnableDiscoveryClient
 @SpringBootApplication(exclude = {
 //        EurekaClientAutoConfiguration.class
         ConsulAutoServiceRegistrationAutoConfiguration.class,
