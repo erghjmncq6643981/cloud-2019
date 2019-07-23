@@ -1,6 +1,8 @@
 package com.chandler.instance.client.example.entity;
 
 
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 /**
@@ -10,8 +12,12 @@ import lombok.Data;
  * @since 1.8
  */
 @Data
+@ApiModel(value="测试对象",description = "测试对象")
 public class Person {
+    @ApiModelProperty(value = "姓名",name="name",example="chandler")
     private String name;
+    @ApiModelProperty(value = "年龄",name="age",example="18")
     private String age;
+    @ApiModelProperty(value = "性别",name="sex",example="man")
     private String sex;
 }
