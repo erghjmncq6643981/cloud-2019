@@ -15,7 +15,7 @@ import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.cloud.consul.discovery.ConsulDiscoveryClientConfiguration;
 import org.springframework.cloud.consul.serviceregistry.ConsulAutoServiceRegistrationAutoConfiguration;
 import org.springframework.cloud.consul.serviceregistry.ConsulServiceRegistryAutoConfiguration;
-import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
+import org.springframework.cloud.netflix.ribbon.RibbonClient;
 
 /**
  * 网关路由gateway-eureka，consul客户端
@@ -23,16 +23,14 @@ import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
  * @author 钱丁君-chandler 2019/5/21上午11:09
  * @since 1.8
  */
-
+@RibbonClient(value = "custom")
 @EnableDiscoveryClient
 @SpringBootApplication(exclude = {
-//        EurekaClientAutoConfiguration.class
-        ConsulAutoServiceRegistrationAutoConfiguration.class,
-        ConsulDiscoveryClientConfiguration.class,
-        ConsulServiceRegistryAutoConfiguration.class
-})
+		// EurekaClientAutoConfiguration.class
+		ConsulAutoServiceRegistrationAutoConfiguration.class, ConsulDiscoveryClientConfiguration.class,
+		ConsulServiceRegistryAutoConfiguration.class })
 public class Application {
-    public static void main(String[] args) {
-        SpringApplication.run(Application.class, args);
-    }
+	public static void main(String[] args) {
+		SpringApplication.run(Application.class, args);
+	}
 }
