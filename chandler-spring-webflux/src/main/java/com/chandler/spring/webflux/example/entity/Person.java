@@ -1,4 +1,4 @@
-package com.chandler.instance.client.example.entity;
+package com.chandler.spring.webflux.example.entity;
 
 
 import io.swagger.annotations.ApiModel;

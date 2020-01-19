@@ -11,16 +11,14 @@
  * @version 1.0
  */
 
-package com.chandler.instance.client.example.config;
+package com.chandler.spring.webflux.example.config;
 
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import springfox.documentation.builders.ApiInfoBuilder;
 import springfox.documentation.builders.PathSelectors;
 import springfox.documentation.builders.RequestHandlerSelectors;
 import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
-import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 /**
  * Swagger配置
@@ -29,8 +27,8 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
  * @author 钱丁君-chandler 2019年6月28日下午5:28:08
  * @since 1.8
  */
-@EnableSwagger2
-@Configuration
+//@EnableSwagger2
+//@Configuration
 public class Swagger2Config {
 	@Bean
 	public Docket createRestApi() {

@@ -1,6 +1,6 @@
-package com.chandler.instance.client.example.controller;
+package com.chandler.spring.webflux.example.controller;
 
-import com.chandler.instance.client.example.entity.Person;
+import com.chandler.spring.webflux.example.entity.Person;
 import io.swagger.annotations.Api;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
@@ -14,7 +14,7 @@ import io.swagger.annotations.ApiParam;
  * @since 1.8
  */
 @Api( tags = "服务调用者Demo接口")
-@RestController
+//@RestController
 public class RestServiceProvider {
 
     @Value("${server.port}")

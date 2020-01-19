@@ -1,5 +1,5 @@
 
-package com.chandler.instance.client.example;
+package com.chandler.spring.webflux.example;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
