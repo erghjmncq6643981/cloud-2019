@@ -35,8 +35,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class MicrometerGaugeTest {
     private SimpleMeterRegistry registry;
 
-    private AtomicInteger value;
-
     @BeforeEach
     void init() {
         registry = new SimpleMeterRegistry();

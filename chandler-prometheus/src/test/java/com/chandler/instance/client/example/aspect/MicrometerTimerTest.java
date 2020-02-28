@@ -63,7 +63,7 @@ public class MicrometerTimerTest {
         timer.record(Duration.ofMillis(System.currentTimeMillis() - start));
         log.info("Timer max:{}", timer.max(TimeUnit.SECONDS));
         log.info("Timer count:{}", timer.count());
-        log.info("Timer count:{}", timer.totalTime(TimeUnit.SECONDS));
+        log.info("Timer total:{}", timer.totalTime(TimeUnit.SECONDS));
     }
 
     @Test
