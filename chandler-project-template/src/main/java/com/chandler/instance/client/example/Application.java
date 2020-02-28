@@ -5,7 +5,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 /**
- * spring5测试工程
+ * 模版工程
  * 
  * @version
  * @author kyle 2019年5月9日下午6:25:00

@@ -29,8 +29,8 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
  * @author 钱丁君-chandler 2019年6月28日下午5:28:08
  * @since 1.8
  */
-//@EnableSwagger2
-//@Configuration
+@EnableSwagger2
+@Configuration
 public class Swagger2Config {
 	@Bean
 	public Docket createRestApi() {
