@@ -12,10 +12,10 @@
  */
 package com.chandler.instance.client.example.aspect;
 
-import com.google.common.collect.Lists;
-import io.micrometer.core.instrument.*;
 import io.micrometer.prometheus.PrometheusMeterRegistry;
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.ArrayUtils;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -23,19 +23,15 @@ import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
-
-import javax.annotation.PostConstruct;
-import javax.servlet.http.HttpServletRequest;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.time.Duration;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
- * 接口信息监控
+ * 接口监控指标采集器
  *
  * @author 钱丁君-chandler 2020/2/27 5:28 PM
  * @version 1.0.0
@@ -44,21 +40,11 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Aspect
 @Slf4j
 @Component
+@Data
 public class MerticCollector {
     @Autowired
     private PrometheusMeterRegistry registry;
-    private Counter counter;
-    private Timer timer;
-    private AtomicInteger intGauge;
-    private DistributionSummary summary;
-
-    @PostConstruct
-    private void init() { //这些变量的变化会被监控
-        counter = registry.counter("httpin_req_total", "listCount", "listCount");
-        intGauge = registry.gauge("httpin_rate", Lists.newArrayList(new ImmutableTag("env", "test")), new AtomicInteger());
-        timer=registry.timer("httpin_duration_tinme","env", "test");
-        summary = registry.summary("api_summary", "env", "test");
-    }
+    private Object retObj;
 
     @Pointcut("@annotation(com.chandler.instance.client.example.aspect.PrometheusAsepect)")
     private void mqPrometheusMethodPointCut() {
@@ -66,31 +52,89 @@ public class MerticCollector {
 
     @Around("mqPrometheusMethodPointCut()")
     public Object arround(ProceedingJoinPoint joinPoint) throws Throwable {
-        long start = System.currentTimeMillis();
-        Object retObj = joinPoint.proceed();
-        summary.record(System.currentTimeMillis() - start);
-        counter.increment();
-
         // 获取方法的相关信息
         MethodSignature signature = (MethodSignature) joinPoint.getSignature();
         Method method = signature.getMethod();
-        RequestMapping requestMapping;
-        if(method.isAnnotationPresent(RequestMapping.class)){
-            requestMapping = method.getAnnotation(RequestMapping.class);
-        }
+        //解析上报指标
+        if (method.isAnnotationPresent(PrometheusAsepect.class)) {
+            PrometheusAsepect prometheusAsepect = method.getAnnotation(PrometheusAsepect.class);
+            Map<String, PrometheusMetric> prometheusMetrics = getMetric(prometheusAsepect);
 
-        PrometheusAsepect prometheusAsepect;
-        if(method.isAnnotationPresent(PrometheusAsepect.class)){
-            prometheusAsepect = method.getAnnotation(PrometheusAsepect.class);
-        }
+            Object[] args = joinPoint.getArgs();
+            //获取所有参数上的注解
+            Annotation[][] parameterAnnotations = signature.getMethod().getParameterAnnotations();
+            Arrays.stream(parameterAnnotations).forEach(parameterAnnotation -> {
+                int paramIndex = ArrayUtils.indexOf(parameterAnnotations, parameterAnnotation);
+                Arrays.stream(parameterAnnotation).forEach(annotation -> {
+                    Object paramValue = args[paramIndex];
+                    if (paramValue instanceof String) {
+                        String param = (String) paramValue;
+                        if (annotation instanceof MetricSuffix) {
+                            prometheusMetrics.forEach((k, prometheusMetric) -> {
+                                prometheusMetric.setSuffix(param);
+                            });
+                        }
+                        if (annotation instanceof Label) {
+                            Label label = (Label) annotation;
+                            prometheusMetrics.forEach((k, prometheusMetric) -> {
+                                prometheusMetric.addLabel(label.name(), param);
+                            });
+                        }
+                    }
+                });
+            });
 
-        Object[] args=joinPoint.getArgs();
-        ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
-        HttpServletRequest req = attributes.getRequest();
-        Duration.ofMillis(System.currentTimeMillis() - start);
-        timer.record(Duration.ofMillis(System.currentTimeMillis() - start));
-//        timer.record(System.currentTimeMillis() - start, TimeUnit.MILLISECONDS);
+
+            prometheusMetrics.forEach((k, prometheusMetric) -> {
+                switch (prometheusMetric.getType()) {
+                    case counter:
+                        registry.counter(prometheusMetric.getMetricName(), prometheusMetric.getTags()).increment();
+                        break;
+                    case gauvge:
+                        registry.gauge(prometheusMetric.getMetricName(), prometheusMetric.getTags(), 1.0);
+                        break;
+                    case timer:
+                        long start = System.currentTimeMillis();
+                        try {
+                            retObj = joinPoint.proceed();
+                        } catch (Throwable e) {
+                            log.warn("执行失败，原因：{}", e.getMessage());
+                        }
+                        registry.timer(prometheusMetric.getMetricName(), prometheusMetric.getTags()).record(Duration.ofMillis(System.currentTimeMillis() - start));
+                        break;
+                    case summary:
+                        break;
+                    default:
+                        break;
+                }
+
+            });
+        }
+        if (null == retObj) {
+            retObj = joinPoint.proceed();
+        }
         return retObj;
+    }
+
+    private Map<String, PrometheusMetric> getMetric(PrometheusAsepect prometheusAsepect) {
+        Map<String, PrometheusMetric> prometheusMetricMap = new HashMap<>();
+        Metric[] metrics = prometheusAsepect.mertics();
+        if (null != metrics && metrics.length != 0) {
+            Arrays.stream(metrics).forEach(metric -> {
+                PrometheusMetric prometheusMetric = new PrometheusMetric();
+                prometheusMetric.setPrefix(prometheusAsepect.value());
+                prometheusMetric.setSuffix(prometheusAsepect.suffix());
+                prometheusMetric.setName(metric.value());
+                prometheusMetric.setType(metric.type());
+                if (null != metric.labels() && metric.labels().length != 0) {
+                    Arrays.stream(metric.labels()).forEach(label -> {
+                        prometheusMetric.addLabel(label.name(), label.value());
+                    });
+                }
+                prometheusMetricMap.put(prometheusMetric.getMetricName(), prometheusMetric);
+            });
+        }
+        return prometheusMetricMap;
     }
 
 }

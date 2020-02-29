@@ -24,6 +24,8 @@ import java.lang.annotation.*;
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-    public @interface PrometheusAsepect {
-    String[] value();
+public @interface PrometheusAsepect {
+    String value() default "";
+    String suffix() default "";
+    Metric[] mertics();
 }

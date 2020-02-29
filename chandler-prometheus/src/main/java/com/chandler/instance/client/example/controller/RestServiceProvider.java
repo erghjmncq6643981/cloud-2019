@@ -1,10 +1,8 @@
 package com.chandler.instance.client.example.controller;
 
-import com.chandler.instance.client.example.aspect.PrometheusAsepect;
+import com.chandler.instance.client.example.aspect.*;
 import com.chandler.instance.client.example.entity.Person;
-import io.micrometer.core.instrument.MeterRegistry;
 import io.swagger.annotations.Api;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 import io.swagger.annotations.ApiOperation;
@@ -23,9 +21,6 @@ public class RestServiceProvider {
     @Value("${server.port}")
     private String port;
 
-    @Autowired
-    private MeterRegistry registry;
-
     /**
      * @param name
      * @return Person
@@ -33,9 +28,16 @@ public class RestServiceProvider {
      * @create date 2018年5月19日上午9:44:08
      */
     @ApiOperation(value = "post请求测试")
-    @PrometheusAsepect("")
+    @PrometheusAsepect(value = "", mertics = {
+            @Metric(value = "httpin_req_total", type = MetricType.counter, labels = {
+                    @Label(name = "listCount", value = "listCount")
+            }),
+            @Metric(value = "httpin_duration_tinme", type = MetricType.timer, labels = {
+                    @Label(name = "env", value = "test")
+            })
+    })
     @RequestMapping(value = "/demo/postPerson", method = RequestMethod.POST, produces = "application/json; charset=UTF-8")
-    public Person postPerson(@ApiParam(value = "姓名", required = true, defaultValue = "chandler") @RequestParam("name") String name) {
+    public Person postPerson(@ApiParam(value = "姓名", required = true, defaultValue = "chandler") @RequestParam("name") @MetricSuffix String name) {
         Person person = new Person();
         person.setName(name);
         person.setAge("10");
