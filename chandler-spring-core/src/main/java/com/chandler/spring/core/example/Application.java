@@ -2,8 +2,10 @@
 package com.chandler.spring.core.example;
 
 import com.chandler.spring.core.example.annotation.EnableMyImport;
+import com.chandler.spring.core.example.entity.CarSpringBean;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.ConfigurableApplicationContext;
 
 /**
  * Spring Boot核心使用方式测试
@@ -16,6 +18,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 public class Application {
 	public static void main(String[] args) {
-		SpringApplication.run(Application.class, args);
+		ConfigurableApplicationContext context = SpringApplication.run(Application.class, args);
+		CarSpringBean carSpringBean = (CarSpringBean) context.getBean("car");
+		System.out.println("启动类" + carSpringBean.toString());
 	}
 }

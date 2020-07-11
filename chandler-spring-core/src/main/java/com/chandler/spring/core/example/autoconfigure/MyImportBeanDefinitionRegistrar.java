@@ -12,9 +12,7 @@
  */
 package com.chandler.spring.core.example.autoconfigure;
 
-import com.chandler.spring.core.example.entity.CarSpringBean;
 import com.chandler.spring.core.example.entity.Person;
-import com.chandler.spring.core.example.entity.Seat;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanDefinitionHolder;
@@ -43,7 +41,7 @@ public class MyImportBeanDefinitionRegistrar implements ImportBeanDefinitionRegi
         beanDefinition.getPropertyValues().addPropertyValue("car", new RuntimeBeanReference("car"));
         // 获取beanName
         String beanName = BeanDefinitionReaderUtils.generateBeanName(beanDefinition, registry);
-        log.info("class: [{}], beanName: [{}]", Person.class.toString(),beanName);
+        log.info("class: [{}], beanName: [{}]", Person.class.toString(), beanName);
         // 将Person注册到Person
         registerComponent(registry, beanDefinition, beanName);
     }
