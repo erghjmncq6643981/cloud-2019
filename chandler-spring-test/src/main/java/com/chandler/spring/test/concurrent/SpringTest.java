@@ -19,7 +19,7 @@ import org.springframework.util.concurrent.ListenableFutureCallback;
 
 
 /**
- * 类功能描述
+ * spring ListenableFuture测试
  *
  * @author 钱丁君-chandler 2019/11/27 7:18 PM
  * @version 1.0.0
