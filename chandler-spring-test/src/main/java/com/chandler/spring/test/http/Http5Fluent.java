@@ -11,6 +11,13 @@
  */
 package com.chandler.spring.test.http;
 
+import com.alibaba.fastjson.JSON;
+import com.chandler.spring.test.entities.EtlReq;
+import com.chandler.spring.test.entities.MetaParam;
+import com.chandler.spring.test.entities.RequestParam;
+import com.chandler.spring.test.util.DateUtil;
+import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.hc.client5.http.fluent.Request;
 import org.apache.hc.client5.http.fluent.Response;
 import org.apache.hc.core5.http.ContentType;
@@ -23,9 +30,7 @@ import org.apache.hc.core5.net.URIBuilder;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 类功能描述
@@ -34,6 +39,7 @@ import java.util.Map;
  * @version 1.0.0
  * @since 1.8
  */
+@Slf4j
 public class Http5Fluent {
     private static final String appIdKey = "c78c3fac730c4347901176240b83e3d8,a96e2597f3ea4daa92faef4030bd120a";
 
@@ -66,8 +72,35 @@ public class Http5Fluent {
         try {
             result = request.execute().returnContent().asString();
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error("发送失败，body:{}",body,e);
         }
         return result;
+    }
+
+    public static void main(String[] args) {
+        Date start=DateUtil.stringToDay("2024-01-01");
+        Date end=DateUtil.stringToDay("2024-01-04");
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(end);
+        cal.add(Calendar.DAY_OF_MONTH,-3);
+        while(end.after(start)){
+            EtlReq param=new EtlReq();
+            param.setPlanArrivalTimeFrom(DateUtil.TIME_FORMATTER.format(cal.getTime()));
+            param.setPlanArrivalTimeTo(DateUtil.TIME_FORMATTER.format(end));
+            log.info("EtlReq:{}", param);
+            RequestParam<EtlReq> req= new RequestParam<>();
+            req.setParams(param);
+            MetaParam meta=new MetaParam();
+            meta.setCode("XXR1804201034");
+            meta.setTag("测试");
+            meta.setClient("WB");
+            meta.setTime(1710922389);
+            req.setMeta(meta);
+            String response=sendPost("https://new.carrierglobe.com/gw/ordersearch/order/etl", JSON.toJSONString(req));
+            log.info("Response:{}", response);
+            end=cal.getTime();
+            cal.setTime(end);
+            cal.add(Calendar.DAY_OF_MONTH,-3);
+        }
     }
 }

@@ -1,0 +1,1 @@
+package com.chandler.spring.test.mapstruct;
